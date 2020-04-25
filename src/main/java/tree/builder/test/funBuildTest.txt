@@ -4,7 +4,7 @@ fun foo(str: String, int1: Int, char1: Char): Int {
     return -1
 }
 
-val "fun foo foo"
+val str = "fun foo foo"
 
 fun foo2(arr: Array<Int>, my: My, your: Your): Any {
     val v1 = "fun foo foo"

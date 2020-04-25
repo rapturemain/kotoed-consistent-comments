@@ -35,8 +35,8 @@ public final class Keyword {
         return withBody;
     }
 
-    public Pair<Integer, Node> handle(int startIndex, String text) throws Exception {
-        return executor.execute(startIndex, text);
+    public Pair<Integer, Node> handle(int startIndex, EntryList entries) throws Exception {
+        return executor.execute(startIndex, entries);
     }
 
     // Static module
@@ -47,47 +47,23 @@ public final class Keyword {
     }
 
     public static Keyword fun = new Keyword("fun", true, new Executor() {
-        public Pair<Integer, Node> execute(int startIndex, String str) throws Exception {
-            int i = startIndex;
-            StringBuilder sb = new StringBuilder();
-
-            while (str.charAt(i) != ' ') {
-                i++;
-            }
-            i++;
-
-            while (str.charAt(i) != '(') {
-                sb.append(str.charAt(i));
-                i++;
-            }
-            String name = sb.toString().trim();
-            sb.delete(0, sb.length());
+        public Pair<Integer, Node> execute(int index, EntryList entries) throws Exception {
+            String name = entries.get(index + 1).getString();
 
             // Arguments
-            String buffer;
-            boolean isVararg = false;
             List<ArgumentNode> arguments = new LinkedList<ArgumentNode>();
-            int bodyStart = BuilderUtils.findClosingBracket(i, '(', ')', str);
-            for (++i; i < bodyStart; i++) {
-                while (str.charAt(i) != ':' && i < bodyStart) {
-                    if (str.charAt(i) == ' ') {
-                        if (sb.toString().equals("vararg")) {
-                            isVararg = true;
-                        }
-                        sb.delete(0, sb.length());
-                        i++;
-                        continue;
-                    }
-                    sb.append(str.charAt(i++));
+            int i = entries.findFirst(index, "(");
+            int bodyStart = BuilderUtils.findClosingBracket(i, "(", ")", entries);
+            boolean isVararg = false;
+            for (; i < bodyStart; i++) {
+                if (entries.get(i).getString().equals("vararg")) {
+                    isVararg = true;
+                    continue;
                 }
-                buffer = sb.toString();
-                sb = new StringBuilder();
-                while (str.charAt(i) != ',' && i < bodyStart) {
-                    sb.append(str.charAt(i++));
+                if (entries.getString(i + 1).equals(":")) {
+                    arguments.add(new ArgumentNode(entries.getString(i), entries.getString(i + 2), isVararg));
+                    i += 2;
                 }
-                arguments.add(new ArgumentNode(buffer, sb.toString().replaceAll("[ :]", ""), isVararg));
-                sb.delete(0, sb.length());
-                isVararg = false;
             }
 
             for (int j = 0; j < arguments.size(); j++) {
@@ -99,44 +75,35 @@ public final class Keyword {
                 }
             }
 
+            if (entries.findFirst(bodyStart, "=") != -1 && entries.findFirst(bodyStart, "=") < entries.findFirst(bodyStart, "{")) {
+                // TODO
+            }
+
             // Type
-            bodyStart++;
-            while (str.charAt(bodyStart) != '=' && str.charAt(bodyStart) != '{') {
-                sb.append(str.charAt(bodyStart++));
-            }
+            String type = entries.getString(entries.findFirst(bodyStart, ":") + 1);
+            bodyStart = entries.findFirst(bodyStart, "{");
 
-            String type = sb.toString().replaceAll("[ :]", "");
-
-            //
-            CallableNode node;
-            int closing = 0;
-            if (str.charAt(bodyStart) == '{') {
-                closing = BuilderUtils.findClosingBracket(bodyStart, '{', '}', str);
-                node = new CallableNode(
-                        name,
-                        type,
-                        arguments,
-                        BuilderUtils.createBodyNode(str.substring(bodyStart, closing)
-                        ));
-                node.getArguments().forEach(it -> it.setParent(node));
-                node.getBody().setParent(node);
-            } else if (str.charAt(i) == '=') {
-                return null;
-            } else {
-                throw new Exception("Something went wrong while creating a fun");
-            }
+            int closing = BuilderUtils.findClosingBracket(bodyStart, "{", "}", entries);
+            CallableNode node = new CallableNode(
+                    name,
+                    type,
+                    arguments,
+                    BuilderUtils.createBodyNode(entries.subList(bodyStart + 1, closing - 1))
+            );
             node.getArguments().forEach(it -> it.setParent(node));
             node.getBody().setParent(node);
             return new Pair<>(closing, node);
         }
     });
 
+  //  public static Keyword var = new Keyword("var", false, null);
+  //  public static Keyword val = new Keyword("val", false, var.executor);
+
     static {
         map.put(fun.toString(), fun);
     }
 
     private interface Executor {
-
-        abstract Pair<Integer, Node> execute(int startIndex, String str) throws Exception;
+        Pair<Integer, Node> execute(int index, EntryList entries) throws Exception;
     }
 }

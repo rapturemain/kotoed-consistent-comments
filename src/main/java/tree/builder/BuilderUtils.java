@@ -1,5 +1,6 @@
 package tree.builder;
 
+import javafx.util.Pair;
 import tree.BodyNode;
 import tree.Node;
 
@@ -13,17 +14,17 @@ public class BuilderUtils {
      * @param startIndex of search
      * @param opening bracket
      * @param closing bracket
-     * @param str to search in
+     * @param entries - entry list
      * @return index of closing bracket or -1 if bracket isn't found
      */
-    public static int findClosingBracket(int startIndex, char opening, char closing, String str) {
+    public static int findClosingBracket(int startIndex, String opening, String closing, EntryList entries) {
         int opened = 0;
-        for (int i = startIndex; i < str.length(); i++) {
-            if (str.charAt(i) == opening) {
+        for (int i = startIndex; i < entries.size(); i++) {
+            if (entries.get(i).getString().equals(opening)) {
                 opened++;
                 continue;
             }
-            if (str.charAt(i) == closing) {
+            if (entries.get(i).getString().equals(closing)) {
                 opened--;
                 if (opened == 0) {
                     return i;
@@ -33,9 +34,14 @@ public class BuilderUtils {
         return -1;
     }
 
-    public static BodyNode createBodyNode (String str) {
+    public static BodyNode createBodyNode (EntryList entries) {
         List<Node> nodes = Collections.emptyList();
-        // TODO
+//        for (int i = 0; i < entries.size(); i++) {
+//            Keyword keyword = Keyword.get(entries.get(i).getString());
+//            if (keyword != null) {
+//                keyword.handle(i, entries);
+//            }
+//        }
         return new BodyNode(nodes);
     }
 
