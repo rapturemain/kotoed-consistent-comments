@@ -5,6 +5,22 @@ public class BrunchNode extends AbstractNode {
         super(Type.BRUNCH);
     }
 
+    public BrunchNode(EquationNode equation, BodyNode trueNode, BodyNode falseNode) {
+        super(Type.BRUNCH);
+        this.equation = equation;
+        if (equation != null) {
+            equation.setParent(this);
+        }
+        this.trueNode = trueNode;
+        this.falseNode = falseNode;
+        if (falseNode != null) {
+            falseNode.setParent(this);
+        }
+        if (trueNode != null) {
+            trueNode.setParent(this);
+        }
+    }
+
     private EquationNode equation = null;
     private Node trueNode = null;
     private Node falseNode = null;

@@ -13,6 +13,6 @@ public abstract class NamedNode extends AbstractNode {
     }
 
     public String toString() {
-        return "Type: " + type.toString() + " Name: " + name;
+        return "Type: " + type.toString() + " Name: " + name + " Line: " + line;
     }
 }

@@ -16,6 +16,14 @@ public class EntryList extends ArrayList<Entry> {
         return super.add(new Entry(index, string));
     }
 
+    public boolean add(int index, String string, int line) {
+        boolean result = super.add(new Entry(index, string));
+        if (result) {
+            this.get(this.size() - 1).setLine(line);
+        }
+        return result;
+    }
+
     public String getString(int i) {
         return this.get(i).getString();
     }
@@ -24,13 +32,22 @@ public class EntryList extends ArrayList<Entry> {
         return this.get(i).getIndex();
     }
 
-    public int findFirst(int start, String string) {
+    public int getFirst(int start, String string) {
         for (int i = start; i < this.size(); i++) {
             if (this.getString(i).equals(string)) {
                 return i;
             }
         }
         return -1;
+    }
+
+    public Entry getEntryWithIndex(int index) {
+        for (Entry en : this) {
+            if (en.getIndex() == index) {
+                return en;
+            }
+        }
+        return null;
     }
 
     public EntryList subList(int fromIndex, int toIndex) {
@@ -43,5 +60,13 @@ public class EntryList extends ArrayList<Entry> {
             sub.add(this.get(i));
         }
         return sub;
+    }
+
+    public List<String> stringList() {
+        List<String> strings = new ArrayList<>(this.size());
+        for (Entry en : this) {
+            strings.add(en.getString());
+        }
+        return strings;
     }
 }

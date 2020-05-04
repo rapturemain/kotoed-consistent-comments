@@ -27,6 +27,16 @@ public interface Node {
         }
     }
 
+    int getLine();
+
+    void setLine(int Line);
+
+    void setParent(Node parent);
+
+    void setNext(Node next);
+
+    void setPrev(Node prev);
+
     Type getType();
 
     Node getNext();

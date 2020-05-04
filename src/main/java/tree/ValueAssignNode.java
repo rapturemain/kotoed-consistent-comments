@@ -3,17 +3,20 @@ package tree;
 import java.util.List;
 
 public class ValueAssignNode extends NamedNode {
-    public ValueAssignNode(Type type, String name, String typeName, List<Node> nodes) {
-        super(type, name);
-        this.nodes = nodes;
+    public ValueAssignNode(String name, String typeName, EquationNode equation) {
+        super(Type.VALUE_ASSIGN, name);
+        this.equation = equation;
+        if (equation != null) {
+            equation.setParent(this);
+        }
         this.typeName = typeName;
     }
 
-    private List<Node> nodes;
+    private EquationNode equation;
     private String typeName;
 
-    public List<Node> getNodes() {
-        return nodes;
+    public EquationNode getEquation() {
+        return equation;
     }
 
     public String getTypeName() {

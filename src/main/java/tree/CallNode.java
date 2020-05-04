@@ -3,20 +3,20 @@ package tree;
 import java.util.List;
 
 public class CallNode extends NamedNode {
-    public CallNode(String name, CallableNode called, List<ValueAssignNode> arguments) {
+    public CallNode(String name, CallableNode called, List<NamedNode> arguments) {
         super(Type.CALL, name);
         this.called = called;
         this.arguments = arguments;
     }
 
     private CallableNode called;
-    private List<ValueAssignNode> arguments;
+    private List<NamedNode> arguments;
 
     public CallableNode getCalled() {
         return called;
     }
 
-    public List<ValueAssignNode> getArguments() {
+    public List<NamedNode> getArguments() {
         return arguments;
     }
 

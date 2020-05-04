@@ -9,6 +9,16 @@ public abstract class AbstractNode implements Node {
     protected Node prev = null;
     protected Node parent = null;
     protected final Type type;
+    protected int line = 0;
+
+    @Override
+    public int getLine() {
+        return line;
+    }
+
+    public void setLine(int line) {
+        this.line = line;
+    }
 
     public void setParent(Node parent) {
         this.parent = parent;
@@ -39,6 +49,6 @@ public abstract class AbstractNode implements Node {
     }
 
     public String toString() {
-        return "Type: " + type.toString();
+        return "Type: " + type.toString() + " Line: " + line;
     }
 }
