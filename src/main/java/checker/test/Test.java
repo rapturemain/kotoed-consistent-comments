@@ -39,7 +39,7 @@ public class Test {
                 countLines++;
             }
         }
-        for (int i = 0; i < countLines; i++) {
+        for (int i = 1; i <= countLines; i++) {
             Pair<Integer, String> result = Checker.check(file1, file1, i);
             if (result.getKey() != i) {
                 if (result.getKey() != -2) {

@@ -16,15 +16,15 @@ public class Checker {
         if (oldNode == null) {
             return new Pair<>(-2, "Cannot find node on the line: " + line);
         }
-        Node newNode = findClosest(tree1, tree2, oldNode);
+        Node newNode = findClosest(tree2, oldNode);
         if (newNode == null) {
             return new Pair<>(-1, "Cannot find pair node for node on the line: " + line);
         }
         return new Pair<>(newNode.getLine(), "Found: " + newNode.toString());
     }
 
-    private static Node findClosest(Tree tree1, Tree tree2, Node node) {
-        double bestRate = 0.3;
+    private static Node findClosest(Tree tree2, Node node) {
+        double bestRate = 0.5;
         Node bestNode = null;
         List<Node> nodes = CheckerUtils.getAllNodes(tree2);
         for (Node n2 : nodes) {
@@ -51,7 +51,9 @@ public class Checker {
                 rate /= steps;
             }
             rate += node.equalityRate(n2);
-            rate /= 2;
+            if (steps > 0) {
+                rate /= 2;
+            }
             if (rate > bestRate) {
                 bestRate = rate;
                 bestNode = n2;
