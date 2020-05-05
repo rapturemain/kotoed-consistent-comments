@@ -14,7 +14,7 @@ public class Checker {
         Tree tree2 = Builder.build(file2);
         Node oldNode = CheckerUtils.getClosestNode(tree1, line);
         if (oldNode == null) {
-            return new Pair<>(-1, "Cannot find node on the line: " + line);
+            return new Pair<>(-2, "Cannot find node on the line: " + line);
         }
         Node newNode = findClosest(tree1, tree2, oldNode);
         if (newNode == null) {

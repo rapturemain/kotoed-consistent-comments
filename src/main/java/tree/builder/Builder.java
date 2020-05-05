@@ -1,6 +1,7 @@
 package tree.builder;
 
 import javafx.util.Pair;
+import tree.EquationNode;
 import tree.Node;
 import tree.Tree;
 
@@ -19,6 +20,7 @@ public class Builder {
             Keyword keyword = Keyword.get(entry.getString());
             if (keyword == null) {
                 list.add(BuilderUtils.createEquationNode(i, entries));
+                i += ((EquationNode) list.get(list.size() - 1)).getComponents().size() - 1;
                 continue;
             }
             pair = keyword.handle(i, entries);

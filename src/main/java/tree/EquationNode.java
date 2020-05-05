@@ -41,6 +41,9 @@ public class EquationNode extends AbstractNode {
         if (thisSize == 0) {
             thisSize = 1;
         }
-        return 1.0 * same / thisSize * (otherSize == 0 ? 1 : otherSize) / thisSize;
+        if (otherSize == 0) {
+            otherSize = 1;
+        }
+        return 1.0 * same / thisSize * Math.min(thisSize, otherSize) / Math.max(thisSize, otherSize);
     }
 }
