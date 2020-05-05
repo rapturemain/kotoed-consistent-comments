@@ -94,6 +94,18 @@ public class CheckerUtils {
                 nodes.add(n.getEquation());
                 return nodes;
             }
+            case CALL: {
+                CallNode n = (CallNode) node;
+                nodes.addAll(n.getArguments());
+                return nodes;
+            }
+            case EQUATION: {
+                EquationNode n = (EquationNode) node;
+                for (Node n1 : n.getNodes()) {
+                    nodes.add(n1);
+                    nodes.addAll(getAllNodes(n1));
+                }
+            }
             default: {
                 nodes.add(node);
                 return nodes;

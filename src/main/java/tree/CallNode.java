@@ -3,20 +3,14 @@ package tree;
 import java.util.List;
 
 public class CallNode extends NamedNode {
-    public CallNode(String name, CallableNode called, List<NamedNode> arguments) {
+    public CallNode(String name, List<ArgumentNode> arguments) {
         super(Type.CALL, name);
-        this.called = called;
         this.arguments = arguments;
     }
 
-    private CallableNode called;
-    private List<NamedNode> arguments;
+    private List<ArgumentNode> arguments;
 
-    public CallableNode getCalled() {
-        return called;
-    }
-
-    public List<NamedNode> getArguments() {
+    public List<ArgumentNode> getArguments() {
         return arguments;
     }
 
@@ -27,6 +21,22 @@ public class CallNode extends NamedNode {
 
     @Override
     public double equalityRate(Node node) {
-        return 0;
+        if (node.getType() != Type.CALL) {
+            return 0;
+        }
+        CallNode other = (CallNode) node;
+        double rate = 0;
+        for (ArgumentNode ar : this.arguments) {
+            for (ArgumentNode arO : other.arguments) {
+                if (ar.equalityRate(arO) > 0.5) {
+                    rate += 1;
+                }
+            }
+        }
+        if (arguments.size() > 0) {
+            rate /= this.arguments.size();
+        }
+        rate += this.name.equals(other.name) ? 2 : 0;
+        return rate / 2;
     }
 }

@@ -102,7 +102,8 @@ public final class Keyword {
         boolean wasAssign = type.equals("") ?
                 entries.getString(index + 2).equals("=") : entries.getString(index + 4).equals("=");
         if (!wasAssign) {
-            ValueAssignNode it = new ValueAssignNode(name, type, new EquationNode(Collections.emptyList()));
+            ValueAssignNode it = new ValueAssignNode(name, type, new EquationNode(Collections.emptyList(),
+                    Collections.emptyList()));
             it.setLine(entries.get(index).getLine());
             return new Pair<>(index + 3, it);
         }
@@ -123,7 +124,7 @@ public final class Keyword {
                 break;
             }
         }
-        EquationNode statement = BuilderUtils.createEquationNode(opening, closing, entries);;
+        EquationNode statement = BuilderUtils.createEquationNode(opening, entries);
         BodyNode trueBody = null;
         if (!entries.getString(closing + 1).equals("{")) {
             Keyword kw = map.get(entries.getString(closing + 1));
@@ -187,7 +188,7 @@ public final class Keyword {
     public static Keyword forKeyword = new Keyword("for", true, (index, entries) -> {
         int opening = index + 1;
         int closing = BuilderUtils.findClosingBracket(opening, "(", ")", entries);
-        EquationNode equation = BuilderUtils.createEquationNode(opening + 1, closing - 1, entries);
+        EquationNode equation = BuilderUtils.createEquationNode(opening + 1, entries);
         opening = closing + 1;
         closing = BuilderUtils.findClosingBracket(opening, "{", "}", entries);
         BodyNode body = BuilderUtils.createBodyNode(entries.subList(opening, closing));

@@ -11,10 +11,13 @@ public class Test {
     public static void main(String[] args) throws Exception {
         test("funBuildTest1.txt", "funBuildTest2.txt", 17, 26, "Test funBuildTest");
         test("test2old.txt", "test2new.txt", 5, 4, "Test test2");
+        test("test3old.txt", "test3new.txt", 10, 10, "Test test3");
         testUnchanged("funBuildTest1.txt", "Test funBuildTest1");
         testUnchanged("funBuildTest2.txt", "Test funBuildTest2");
         testUnchanged("test2new.txt", "Test test2new");
         testUnchanged("test2old.txt", "Test test2old");
+        testUnchanged("test3new.txt", "Test test3new");
+        testUnchanged("test3old.txt", "Test test3old");
     }
 
     private static void test(String path1, String path2, int line, int expectedLine, String testName) throws Exception {

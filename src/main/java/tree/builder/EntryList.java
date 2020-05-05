@@ -25,6 +25,9 @@ public class EntryList extends ArrayList<Entry> {
     }
 
     public String getString(int i) {
+        if (i < 0 || i >= this.size()) {
+            return "";
+        }
         return this.get(i).getString();
     }
 

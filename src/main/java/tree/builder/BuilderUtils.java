@@ -1,14 +1,9 @@
 package tree.builder;
 
 import javafx.util.Pair;
-import tree.BodyNode;
-import tree.EquationNode;
-import tree.Node;
+import tree.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BuilderUtils {
     /**
@@ -78,16 +73,36 @@ public class BuilderUtils {
         return new BodyNode(nodes);
     }
 
-    public static EquationNode createEquationNode(int index, EntryList entries) {
+    public static EquationNode createEquationNode(int index, EntryList entries) throws Exception {
         boolean wasOperator = true;
+        List<Node> nodes = new ArrayList<>();
         for (int i = index; i < entries.size(); i++) {
             if (entries.getString(i).equals("(")) {
+                int iold = i;
+                String name = entries.getString(i - 1);
                 i = findClosingBracket(i, "(", ")", entries);
+                // Arguments
+                List<ArgumentNode> arguments = new LinkedList<>();
+                boolean isVararg = false;
+                for (; iold < i; iold++) {
+                    if (entries.get(iold).getString().equals("vararg")) {
+                        isVararg = true;
+                        continue;
+                    }
+                    if (entries.getString(iold + 1).equals(":")) {
+                        arguments.add(new ArgumentNode(entries.getString(iold), entries.getString(iold + 2), isVararg));
+                        arguments.get(arguments.size() - 1).setLine(entries.get(iold).getLine());
+                        iold += 2;
+                    }
+                }
+                nodes.add(new CallNode(name, arguments));
                 wasOperator = false;
                 continue;
             }
             if (entries.getString(i).equals("{")) {
+                int iold = i;
                 i = findClosingBracket(i, "{", "}", entries);
+                nodes.add(BuilderUtils.createBodyNode(entries.subList(iold + 1, i - 1)));
                 wasOperator = false;
                 continue;
             }
@@ -96,13 +111,13 @@ public class BuilderUtils {
                 continue;
             }
             if (!wasOperator) {
-                EquationNode eq = new EquationNode(entries.stringList().subList(index, i));
+                EquationNode eq = new EquationNode(entries.stringList().subList(index, i), nodes);
                 eq.setLine(entries.get(index).getLine());
                 return eq;
             }
             wasOperator = false;
         }
-        EquationNode eq = new EquationNode(entries.stringList().subList(index, entries.size()));
+        EquationNode eq = new EquationNode(entries.stringList().subList(index, entries.size()), nodes);
         eq.setLine(entries.get(index).getLine());
         return eq;
     }
@@ -129,11 +144,4 @@ public class BuilderUtils {
         operators.add("<=");
         operators.add(".");
     }
-
-    public static EquationNode createEquationNode(int index, int endIndex, EntryList entries) {
-        EquationNode eq = new EquationNode(entries.stringList().subList(index, endIndex + 1));
-        eq.setLine(entries.get(index).getLine());
-        return eq;
-    }
-
 }

@@ -1,0 +1,19 @@
+fun graphFriends (friends: MutableMap<String, Pair<MutableSet<String>, Int>>, obj: String): MutableSet<String>{
+    if (friends.getValue(obj).first.isEmpty()) return mutableSetOf()
+    if (friends.getValue(obj).second == 0) return friends.getValue(obj).first
+    if (friends.getValue(obj).second == 2) return friends.getValue(obj).first
+    val buffer = mutableSetOf<String>()
+    friends[obj] = friends.getValue(obj).first to 2
+    friends.getValue(obj).first.forEach {
+        it ->
+        if (it != obj) {
+            graphFriends(friends, it).forEach {
+                buffer.add(it)
+            }
+            buffer.add(it)
+        }
+    }
+    buffer.addAll(friends.getValue(obj).first)
+    friends[obj] = buffer.filter { it != obj}.toMutableSet() to 0
+    return buffer
+}

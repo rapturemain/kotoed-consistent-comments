@@ -5,12 +5,31 @@ import java.util.List;
 import java.util.Map;
 
 public class EquationNode extends AbstractNode {
-    public EquationNode(List<String> components) {
+    public EquationNode(List<String> components, List<Node> nodes) {
         super(Type.EQUATION);
         this.components = components;
+        this.nodes = nodes;
+        for (int i = 0; i < nodes.size(); i++) {
+            if (nodes.get(i) == null) {
+                continue;
+            }
+            if (i > 0) {
+                nodes.get(i).setPrev(nodes.get(i - 1));
+            }
+            if (i < nodes.size() - 1) {
+                nodes.get(i).setNext(nodes.get(i + 1));
+            }
+            nodes.get(i).setParent(this);
+        }
     }
 
-    List<String> components;
+    private List<String> components;
+
+    private List<Node> nodes;
+
+    public List<Node> getNodes() {
+        return nodes;
+    }
 
     public List<String> getComponents() {
         return components;
