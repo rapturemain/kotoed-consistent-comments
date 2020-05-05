@@ -10,6 +10,7 @@ import java.io.IOException;
 public class Test {
     public static void main(String[] args) throws Exception {
         test("funBuildTest1.txt", "funBuildTest2.txt", 17, 26, "Test funBuildTest");
+        test("test2old.txt", "test2new.txt", 5, 4, "Test test2");
     }
 
     private static void test(String path1, String path2, int line, int expectedLine, String testName) throws Exception {

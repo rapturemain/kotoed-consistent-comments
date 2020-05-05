@@ -1,0 +1,24 @@
+fun graphFriends(friends: MutableMap<String, Pair<MutableSet<String>, Int>>, obj: String, last: Int):
+        Pair<MutableSet<String>, Int> {
+    if (friends.getValue(obj).second == -1) return (mutableSetOf(obj) to last)
+    if (friends.getValue(obj).second == 1) return (friends.getValue(obj).first to last)
+    if (friends.getValue(obj).second in 3..last) return (friends.getValue(obj).first to last)
+    friends.replace(obj, friends.getValue(obj).first to last)
+    var buffer = mutableSetOf<String>()
+    var max = 0
+    friends.getValue(obj).first.forEach {
+        it ->
+        if ((it != obj) && (friends.containsKey(it))) {
+            val rec = graphFriends(friends, it, last + 1)
+            buffer.addAll(rec.first)
+            if (max < rec.second) max = rec.second
+        } else if (!friends.containsKey(it)) {
+            friends[it] = mutableSetOf<String>() to 1
+        }
+    }
+    val secbuf = friends.getValue(obj).first
+    secbuf.addAll(buffer.filter { it != obj})
+    friends.replace(obj, (secbuf to 1))
+    buffer = friends.getValue(obj).first
+    return (buffer to max)
+}
