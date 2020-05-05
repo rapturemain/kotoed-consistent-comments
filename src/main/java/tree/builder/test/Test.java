@@ -1,6 +1,7 @@
 package tree.builder.test;
 
 import tree.Node;
+import tree.Tree;
 import tree.builder.Builder;
 
 import java.io.*;
@@ -8,8 +9,8 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws Exception {
-        List<Node> list = Builder.build(fileToString("src\\main\\java\\tree\\builder\\test\\funBuildTest.txt"));
-        System.out.println(list.size());
+        Tree list = Builder.build(fileToString("src\\main\\java\\tree\\builder\\test\\funBuildTest.txt"));
+        System.out.println(list.getNodes().size());
     }
 
     private static void assertEquals(Object expected, Object actual) throws Exception {

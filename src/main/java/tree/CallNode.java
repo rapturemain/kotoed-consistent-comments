@@ -24,4 +24,9 @@ public class CallNode extends NamedNode {
     public String toString() {
         return "Type: " + type.toString() + "Name: " + name;
     }
+
+    @Override
+    public double equalityRate(Node node) {
+        return 0;
+    }
 }

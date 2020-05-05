@@ -18,6 +18,7 @@ public class Builder {
             }
             Keyword keyword = Keyword.get(entry.getString());
             if (keyword == null) {
+                list.add(BuilderUtils.createEquationNode(i, entries));
                 continue;
             }
             pair = keyword.handle(i, entries);

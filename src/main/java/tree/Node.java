@@ -44,4 +44,6 @@ public interface Node {
     Node getPrev();
 
     Node getParent();
+
+    double equalityRate(Node node);
 }

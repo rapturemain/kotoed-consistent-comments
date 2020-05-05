@@ -48,4 +48,16 @@ public class BrunchNode extends AbstractNode {
     public Node getFalseNode() {
         return falseNode;
     }
+
+    public double equalityRate(Node node) {
+        if (node.getType() != Type.BRUNCH) {
+            return 0;
+        }
+        BrunchNode other = (BrunchNode) node;
+        double rate = 0;
+        rate += other.getEquation().equalityRate(this.equation);
+        rate += other.getTrueNode().equalityRate(this.trueNode);
+        rate += other.getFalseNode().equalityRate(this.falseNode);
+        return rate / 3;
+    }
 }

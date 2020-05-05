@@ -164,6 +164,9 @@ public final class Keyword {
                 elseBody = BuilderUtils.createBodyNode(entries.subList(opening + 2, closing));
             }
         }
+        if (elseBody == null) {
+            elseBody = BuilderUtils.createBodyNode(entries.subList(opening + 1, opening - 1));
+        }
         BrunchNode it = new BrunchNode(statement, trueBody, elseBody);
         if (closing < opening) {
             closing = opening;

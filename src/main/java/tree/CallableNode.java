@@ -40,4 +40,25 @@ public class CallableNode extends NamedNode {
     public String getReturnType() {
         return returnTypeName;
     }
+
+    public double equalityRate(Node node) {
+        if (node.getType() != Type.CALLABLE) {
+            return 0;
+        }
+        CallableNode other = (CallableNode) node;
+        double rate = 0;
+        for (ArgumentNode ar : this.arguments) {
+            for (ArgumentNode arO : other.arguments) {
+                if (ar.equalityRate(arO) > 0.5) {
+                    rate += 1;
+                }
+            }
+        }
+        if (arguments.size() > 0) {
+            rate /= this.arguments.size();
+        }
+        rate += this.body.equalityRate(other.getBody()) * 3;
+        rate += this.name.equals(other.name) ? 2 : 0;
+        return rate / 3;
+    }
 }

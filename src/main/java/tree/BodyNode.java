@@ -27,4 +27,24 @@ public class BodyNode extends AbstractNode {
     public List<Node> getNodes() {
        return nodes;
     }
+
+    public double equalityRate(Node node) {
+        if (node.getType() != Type.BODY) {
+            return 0;
+        }
+        BodyNode other = (BodyNode) node;
+        double rate = 0;
+        for (Node n : this.nodes) {
+            for (Node nO : other.nodes) {
+                if (n.equalityRate(nO) > 0.5) {
+                    rate += 1;
+                }
+            }
+        }
+        if (this.nodes.size() == 0) {
+            return rate;
+        } else {
+            return rate / this.nodes.size();
+        }
+    }
 }

@@ -1,0 +1,27 @@
+package tree.builder.test
+
+fun foo(str: String, int1: Int, char1: Char): Int {
+    return -1
+}
+
+val str = "fun foo foo"
+
+fun foo2(arr: Array<Int>, my: My, your: Your): Any {
+    val v1 = "fun foo foo"
+    var v2 = "foo foo fun"
+    var v3 = v2.let {
+        doSomething()
+    }
+}
+
+fun foo3() = "sometext".someMethod().let {
+    hardfoo()
+    listfoo()
+    var v = 14 + 15
+}
+
+fun circleInside(x1: Double, y1: Double, r1: Double,
+                 x2: Double, y2: Double, r2: Double): Boolean {
+    if (r1>=r2) return false else
+    return pointInsideCircle(x1, y1, x2, y2, r2-r1)
+}

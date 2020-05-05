@@ -91,7 +91,9 @@ public class BuilderUtils {
                 continue;
             }
             if (!wasOperator) {
-                return new EquationNode(entries.stringList().subList(index, i));
+                EquationNode eq = new EquationNode(entries.stringList().subList(index, i));
+                eq.setLine(entries.get(index).getLine());
+                return eq;
             }
             wasOperator = false;
         }

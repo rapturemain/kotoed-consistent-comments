@@ -12,8 +12,4 @@ public class Tree {
     public List<Node> getNodes() {
         return nodes;
     }
-
-    public Node getNodeByLine(int line) {
-        return null;
-    }
 }

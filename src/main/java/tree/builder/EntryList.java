@@ -51,9 +51,12 @@ public class EntryList extends ArrayList<Entry> {
     }
 
     public EntryList subList(int fromIndex, int toIndex) {
-        if (fromIndex < 0 || fromIndex > toIndex || toIndex >= this.size()) {
+        if (fromIndex < 0 || toIndex >= this.size()) {
             throw new IndexOutOfBoundsException("Entry list size: " + this.size() +
                     " inputs: from " + fromIndex + " to " + toIndex);
+        }
+        if (fromIndex > toIndex) {
+            return new EntryList();
         }
         EntryList sub = new EntryList(toIndex - fromIndex + 1);
         for (int i = fromIndex; i <= toIndex; i++) {
