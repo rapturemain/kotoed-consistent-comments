@@ -1,0 +1,5 @@
+val a = "foo"; val b = "foo"
+
+fun foo() {
+    val a = "foo"; val b = "bar"
+}

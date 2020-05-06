@@ -42,7 +42,7 @@ public class BuilderUtils {
                 i = pair.getKey();
             } else {
                 nodes.add(BuilderUtils.createEquationNode(i, entries));
-                i += ((EquationNode) nodes.get(nodes.size() - 1)).getComponents().size();
+                i += ((EquationNode) nodes.get(nodes.size() - 1)).getComponents().size() - 1;
             }
         }
         return new BodyNode(nodes);
@@ -54,6 +54,7 @@ public class BuilderUtils {
         for (int i = index; i < entries.size(); i++) {
             if (entries.getString(i).equals("(")) {
                 int iold = i + 1;
+                int line = entries.get(i).getLine();
                 String name = entries.getString(i - 1);
                 i = findClosingBracket(i, "(", ")", entries);
                 // Arguments
@@ -63,6 +64,7 @@ public class BuilderUtils {
                     iold += arguments.get(arguments.size() - 1).getComponents().size();
                 }
                 nodes.add(new CallNode(name, arguments));
+                nodes.get(nodes.size() - 1).setLine(line);
                 wasOperator = false;
                 continue;
             }
@@ -110,5 +112,9 @@ public class BuilderUtils {
         operators.add("<");
         operators.add("<=");
         operators.add(".");
+        operators.add("to");
+        operators.add("[");
+        operators.add("]");
+        operators.add("=");
     }
 }

@@ -54,6 +54,7 @@ public class Builder {
         separators.add('>');
         separators.add('[');
         separators.add(']');
+        separators.add(';');
     }
 
     private static EntryList split(String str) {
@@ -66,7 +67,7 @@ public class Builder {
             char c = str.charAt(i);
             if ((!isString && !isChar) && separators.contains(c)) {
                 addToList(sb, i, line, list);
-                if (c == ' ' && !list.get(list.size() - 1).getString().equals(" ")) {
+                if (c == ' ' && !list.get(list.size() - 1).getString().equals(" ") || c == ';') {
                    // list.add(" ");
                     continue;
                 }

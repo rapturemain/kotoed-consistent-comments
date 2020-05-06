@@ -27,11 +27,6 @@ public class CallNode extends NamedNode {
     }
 
     @Override
-    public String toString() {
-        return "Type: " + type.toString() + "Name: " + name;
-    }
-
-    @Override
     public double equalityRate(Node node) {
         if (node.getType() != Type.CALL) {
             return 0;
