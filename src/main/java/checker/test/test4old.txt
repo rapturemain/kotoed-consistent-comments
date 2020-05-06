@@ -1,0 +1,16 @@
+fun foo(string: String) {
+    when (string[5]) {
+        'a' -> {
+            doSomething()
+            rarara()
+        }
+        'b' -> {
+            doAnother()
+            dadada()
+        }
+        'c' -> {
+            doMoreMoreMore()
+            tatata()
+        }
+    }
+}

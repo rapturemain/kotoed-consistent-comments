@@ -9,7 +9,7 @@ import java.util.*;
 
 public class Builder {
     public static Tree build(String text) throws Exception {
-        EntryList entries = split(text, true);
+        EntryList entries = split(text);
         List<Node> list = new ArrayList<>();
         Pair<Integer, Node> pair = null;
         for (int i = 0; i < entries.size(); i++) {
@@ -56,7 +56,7 @@ public class Builder {
         separators.add(']');
     }
 
-    private static EntryList split(String str, boolean ignoreNewLine) {
+    private static EntryList split(String str) {
         int line = 1;
         EntryList list = new EntryList();
         StringBuilder sb = new StringBuilder();
@@ -72,9 +72,6 @@ public class Builder {
                 }
                 if (c == '\n') {
                     line++;
-                    if (!ignoreNewLine) {
-                        list.add(i, "\n", line);
-                    }
                     continue;
                 }
                 if (c == '\r') {

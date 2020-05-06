@@ -12,6 +12,7 @@ public class Test {
         test("funBuildTest1.txt", "funBuildTest2.txt", 17, 26, "Test funBuildTest");
         test("test2old.txt", "test2new.txt", 5, 4, "Test test2");
         test("test3old.txt", "test3new.txt", 10, 10, "Test test3");
+        test("test4old.txt", "test4new.txt", 7, 11, "Test test4");
         testUnchanged("funBuildTest1.txt", "Test funBuildTest1");
         testUnchanged("funBuildTest2.txt", "Test funBuildTest2");
         testUnchanged("test2new.txt", "Test test2new");

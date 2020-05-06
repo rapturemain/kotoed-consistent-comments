@@ -125,7 +125,7 @@ public final class Keyword {
             }
         }
         EquationNode statement = BuilderUtils.createEquationNode(opening, entries);
-        BodyNode trueBody = null;
+        BodyNode trueBody;
         if (!entries.getString(closing + 1).equals("{")) {
             Keyword kw = map.get(entries.getString(closing + 1));
             if (kw != null) {

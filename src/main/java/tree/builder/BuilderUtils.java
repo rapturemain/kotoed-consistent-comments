@@ -31,31 +31,6 @@ public class BuilderUtils {
         return -1;
     }
 
-    public static int findClosingBracket(int startIndex, List<String> opening, List<String> closing, EntryList entries) {
-        int opened = 0;
-        for (int i = startIndex; i < entries.size(); i++) {
-            if (opening.contains(entries.get(i).getString())) {
-                opened++;
-                continue;
-            }
-            if (closing.contains(entries.get(i).getString())) {
-                opened--;
-                if (opened == 0) {
-                    return i;
-                }
-            }
-        }
-        return -1;
-    }
-
-    public static List<String> createStringList(String... strings) {
-        List<String> list = new ArrayList<>(strings.length);
-        for (String str : strings) {
-            list.add(str);
-        }
-        return list;
-    }
-
     public static BodyNode createBodyNode (EntryList entries) throws Exception {
         List<Node> nodes = new ArrayList<>();
         for (int i = 0; i < entries.size(); i++) {
@@ -78,22 +53,14 @@ public class BuilderUtils {
         List<Node> nodes = new ArrayList<>();
         for (int i = index; i < entries.size(); i++) {
             if (entries.getString(i).equals("(")) {
-                int iold = i;
+                int iold = i + 1;
                 String name = entries.getString(i - 1);
                 i = findClosingBracket(i, "(", ")", entries);
                 // Arguments
-                List<ArgumentNode> arguments = new LinkedList<>();
-                boolean isVararg = false;
+                List<EquationNode> arguments = new LinkedList<>();
                 for (; iold < i; iold++) {
-                    if (entries.get(iold).getString().equals("vararg")) {
-                        isVararg = true;
-                        continue;
-                    }
-                    if (entries.getString(iold + 1).equals(":")) {
-                        arguments.add(new ArgumentNode(entries.getString(iold), entries.getString(iold + 2), isVararg));
-                        arguments.get(arguments.size() - 1).setLine(entries.get(iold).getLine());
-                        iold += 2;
-                    }
+                    arguments.add(createEquationNode(iold, entries));
+                    iold += arguments.get(arguments.size() - 1).getComponents().size();
                 }
                 nodes.add(new CallNode(name, arguments));
                 wasOperator = false;

@@ -3,14 +3,26 @@ package tree;
 import java.util.List;
 
 public class CallNode extends NamedNode {
-    public CallNode(String name, List<ArgumentNode> arguments) {
+    public CallNode(String name, List<EquationNode> arguments) {
         super(Type.CALL, name);
         this.arguments = arguments;
+        for (int i = 0; i < arguments.size(); i++) {
+            if (arguments.get(i) == null) {
+                continue;
+            }
+            if (i > 0) {
+                arguments.get(i).setPrev(arguments.get(i - 1));
+            }
+            if (i < arguments.size() - 1) {
+                arguments.get(i).setNext(arguments.get(i + 1));
+            }
+            arguments.get(i).setParent(this);
+        }
     }
 
-    private List<ArgumentNode> arguments;
+    private List<EquationNode> arguments;
 
-    public List<ArgumentNode> getArguments() {
+    public List<EquationNode> getArguments() {
         return arguments;
     }
 
@@ -26,8 +38,8 @@ public class CallNode extends NamedNode {
         }
         CallNode other = (CallNode) node;
         double rate = 0;
-        for (ArgumentNode ar : this.arguments) {
-            for (ArgumentNode arO : other.arguments) {
+        for (EquationNode ar : this.arguments) {
+            for (EquationNode arO : other.arguments) {
                 if (ar.equalityRate(arO) > 0.5) {
                     rate += 1;
                 }

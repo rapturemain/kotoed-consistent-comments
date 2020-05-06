@@ -1,0 +1,16 @@
+fun foo(ooooNameChanged: String) {
+    when (ooooNameChanged[3]) {
+        'f' -> {
+            doSomething()
+            rarara()
+        }
+        'q' -> {
+            doMoreMoreMore()
+            tatata()
+        }
+        'k' -> {
+            doAnother()
+            dadada()
+        }
+    }
+}
