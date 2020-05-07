@@ -35,13 +35,12 @@ public class CallNode extends NamedNode {
         double rate = 0;
         for (EquationNode ar : this.arguments) {
             for (EquationNode arO : other.arguments) {
-                if (ar.equalityRate(arO) > 0.5) {
-                    rate += 1;
-                }
+                rate += ar.equalityRate(arO);
             }
         }
-        if (arguments.size() > 0) {
-            rate /= this.arguments.size();
+        if (this.arguments.size() > 0 && other.arguments.size() > 0) {
+            rate *= 1.0 / this.arguments.size() * Math.min(this.arguments.size(), other.arguments.size()) /
+                    Math.max(this.arguments.size(), other.arguments.size());
         }
         rate += this.name.equals(other.name) ? 2 : 0;
         return rate / 2;

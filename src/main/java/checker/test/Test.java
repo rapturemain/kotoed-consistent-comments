@@ -19,6 +19,18 @@ public class Test {
         testUnchanged("test2old.txt", "Test test2old");
         testUnchanged("test3new.txt", "Test test3new");
         testUnchanged("test3old.txt", "Test test3old");
+        testUnchanged("kotlinasfirst\\Simple.txt", "Test Simple");
+        testUnchanged("kotlinasfirst\\IfElse.txt", "Test IfElse");
+        testUnchanged("kotlinasfirst\\Logical.txt", "Test Logical");
+        testUnchanged("kotlinasfirst\\Loop.txt", "Test Loop");
+        testUnchanged("kotlinasfirst\\List.txt", "Test List");
+        testUnchanged("kotlinasfirst\\Map.txt", "Test Map");
+        testUnchanged("kotlinasfirst\\Files.txt", "Test Files");
+        testUnchanged("kotlinasfirst\\Geometry.txt", "Test Geometry");
+        testUnchanged("kotlinasfirst\\Chess.txt", "Test Chess");
+        testUnchanged("kotlinasfirst\\Graph.txt", "Test Graph");
+        testUnchanged("kotlinasfirst\\Matrix.txt", "Test Matrix");
+        testUnchanged("kotlinasfirst\\Matrices.txt", "Test Matrices");
     }
 
     private static void test(String path1, String path2, int line, int expectedLine, String testName) throws Exception {

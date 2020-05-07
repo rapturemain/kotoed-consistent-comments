@@ -36,15 +36,15 @@ public class BodyNode extends AbstractNode {
         double rate = 0;
         for (Node n : this.nodes) {
             for (Node nO : other.nodes) {
-                if (n.equalityRate(nO) > 0.5) {
-                    rate += 1;
-                }
+                rate += n.equalityRate(nO);
             }
         }
-        if (this.nodes.size() == 0) {
-            return rate;
+        if (this.nodes.size() == 0 && other.nodes.size() == 0) {
+            return 1;
         } else {
-            return rate / this.nodes.size();
+            int s1 = this.nodes.size() == 0 ? 1 : this.nodes.size();
+            int s2 = other.nodes.size() == 0 ? 1 : other.nodes.size();
+            return rate / s1 * 1.0 * Math.min(s1, s2) / Math.max(s1, s2);
         }
     }
 }

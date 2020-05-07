@@ -1,14 +1,18 @@
 package tree;
 
 public class ArgumentNode extends NamedNode {
-    public ArgumentNode(String name, String typeName, boolean isVararg) {
+    public ArgumentNode(String name, EquationNode typeName, boolean isVararg) {
         super(Type.ARGUMENT, name);
         this.typeName = typeName;
         this.isVararg = isVararg;
     }
 
-    private String typeName;
+    private EquationNode typeName;
     private boolean isVararg;
+
+    public EquationNode getTypeName() {
+        return typeName;
+    }
 
     public double equalityRate(Node node) {
         if (node.getType() != Type.ARGUMENT) {
@@ -22,9 +26,7 @@ public class ArgumentNode extends NamedNode {
         if (this.isVararg == other.isVararg) {
             rate += 0.5;
         }
-        if (this.typeName.equals(other.typeName)) {
-            rate += 1.25;
-        }
+        rate += this.typeName.equalityRate(other.typeName);
         return rate / 3;
     }
 }

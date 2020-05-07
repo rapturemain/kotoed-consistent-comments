@@ -30,9 +30,7 @@ public class SimpleNode extends NamedNode {
         double rate = 0;
         for (Node n : this.nodes) {
             for (Node nO : ((SimpleNode) node).getNodes()) {
-                if (n.equalityRate(nO) > 0.5) {
-                    rate += 1;
-                }
+                rate += n.equalityRate(nO);
             }
         }
         rate += this.name.equals(((SimpleNode) node).name) ? 2 : 0;

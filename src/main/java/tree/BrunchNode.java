@@ -22,18 +22,18 @@ public class BrunchNode extends AbstractNode {
     }
 
     private EquationNode equation = null;
-    private Node trueNode = null;
-    private Node falseNode = null;
+    private BodyNode trueNode = null;
+    private BodyNode falseNode = null;
 
     public void setEquation(EquationNode equation) {
         this.equation = equation;
     }
 
-    public void setTrueNode(Node trueNode) {
+    public void setTrueNode(BodyNode trueNode) {
         this.trueNode = trueNode;
     }
 
-    public void setFalseNode(Node falseNode) {
+    public void setFalseNode(BodyNode falseNode) {
         this.falseNode = falseNode;
     }
 
@@ -41,11 +41,11 @@ public class BrunchNode extends AbstractNode {
         return equation;
     }
 
-    public Node getTrueNode() {
+    public BodyNode getTrueNode() {
         return trueNode;
     }
 
-    public Node getFalseNode() {
+    public BodyNode getFalseNode() {
         return falseNode;
     }
 

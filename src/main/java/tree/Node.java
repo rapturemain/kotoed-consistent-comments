@@ -9,7 +9,8 @@ public interface Node {
         VALUE_ASSIGN,
         EQUATION,
         ARGUMENT,
-        CALL;
+        CALL,
+        CLASS;
 
         @Override
         public String toString() {
@@ -22,6 +23,7 @@ public interface Node {
                 case EQUATION: return "Equation";
                 case ARGUMENT: return "Argument";
                 case CALL: return "Call";
+                case CLASS: return "Class";
                 default: return "MISSING ENUM";
             }
         }

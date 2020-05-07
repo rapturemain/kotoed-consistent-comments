@@ -55,6 +55,7 @@ public class Builder {
         separators.add('[');
         separators.add(']');
         separators.add(';');
+        separators.add('/');
     }
 
     private static EntryList split(String str) {
@@ -63,16 +64,47 @@ public class Builder {
         StringBuilder sb = new StringBuilder();
         boolean isString = false;
         boolean isChar = false;
+        boolean warningComment = false;
+        boolean warningCommentEnd = false;
+        boolean singleLineComment = false;
+        int commentBrackets = 0;
         for (int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);
+            if (c == '\n' && !isChar && !isString) {
+                line++;
+                singleLineComment = false;
+            }
+            if (c == '/' && !isString && !isChar && !singleLineComment) {
+                if (warningComment) {
+                    singleLineComment = true;
+                    warningComment = false;
+                } else if (!warningCommentEnd) {
+                    warningComment = true;
+                } else {
+                    commentBrackets -= 1;
+                    warningCommentEnd = false;
+                }
+                sb.append(c);
+                continue;
+            }
+            if (warningComment && c == '*' && !singleLineComment) {
+                commentBrackets += 1;
+                warningComment = false;
+                sb.append(c);
+                continue;
+            }
+            if (commentBrackets > 0 || singleLineComment) {
+                if (commentBrackets > 0) {
+                    warningCommentEnd = c == '*';
+                }
+                sb.append(c);
+                continue;
+            }
+            warningComment = false;
             if ((!isString && !isChar) && separators.contains(c)) {
                 addToList(sb, i, line, list);
-                if (c == ' ' && !list.get(list.size() - 1).getString().equals(" ") || c == ';') {
+                if (c == ' ' && !list.get(list.size() - 1).getString().equals(" ") || c == ';' || c == '\n') {
                    // list.add(" ");
-                    continue;
-                }
-                if (c == '\n') {
-                    line++;
                     continue;
                 }
                 if (c == '\r') {

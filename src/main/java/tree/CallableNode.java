@@ -3,7 +3,7 @@ package tree;
 import java.util.List;
 
 public class CallableNode extends NamedNode {
-    public CallableNode(String name, String returnTypeName, List<ArgumentNode> arguments, BodyNode body) {
+    public CallableNode(String name, EquationNode returnTypeName, List<ArgumentNode> arguments, BodyNode body) {
         super(Type.CALLABLE, name);
         this.returnTypeName = returnTypeName;
         this.arguments = arguments;
@@ -25,7 +25,7 @@ public class CallableNode extends NamedNode {
         }
     }
 
-    private String returnTypeName;
+    private EquationNode returnTypeName;
     private List<ArgumentNode> arguments;
     private BodyNode body;
 
@@ -37,7 +37,7 @@ public class CallableNode extends NamedNode {
         return arguments;
     }
 
-    public String getReturnType() {
+    public EquationNode getReturnType() {
         return returnTypeName;
     }
 
@@ -49,16 +49,19 @@ public class CallableNode extends NamedNode {
         double rate = 0;
         for (ArgumentNode ar : this.arguments) {
             for (ArgumentNode arO : other.arguments) {
-                if (ar.equalityRate(arO) > 0.5) {
-                    rate += 1;
-                }
+                rate += ar.equalityRate(arO);
             }
         }
-        if (arguments.size() > 0) {
-            rate /= this.arguments.size();
+        if (this.arguments.size() > 0 && other.arguments.size() > 0) {
+            rate *= 1.0 / this.arguments.size() * Math.min(this.arguments.size(), other.arguments.size()) /
+                    Math.max(this.arguments.size(), other.arguments.size());
+        }
+        if (other.arguments.size() == 0 && this.arguments.size() == 0) {
+            rate += 0.5;
         }
         rate += this.body.equalityRate(other.getBody()) * 3;
         rate += this.name.equals(other.name) ? 2 : 0;
-        return rate / 3;
+        rate += this.returnTypeName.equalityRate(other.getReturnType());
+        return rate / 4;
     }
 }

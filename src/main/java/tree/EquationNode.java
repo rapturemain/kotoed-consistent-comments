@@ -1,5 +1,6 @@
 package tree;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,16 +44,24 @@ public class EquationNode extends AbstractNode {
         Map<String, Integer> otherMap = new HashMap<>();
         int thisSize = this.components.size();
         int otherSize = other.components.size();
-        for (String component : other.components) {
+        List<String> components = this.components;
+        List<String> componentsO = other.components;
+        if (thisSize == 0 && otherSize == 0) {
+            return 1;
+        }
+        if (thisSize == 1 && otherSize == 1) {
+            components = Arrays.asList(components.get(0).split(" "));
+            componentsO = Arrays.asList(componentsO.get(0).split(" "));
+        }
+        for (String component : componentsO) {
             otherMap.merge(component, 1, Integer::sum);
         }
         int same = 0;
-        int i = 0;
-        for (String component : this.components) {
+        for (String component : components) {
             if (otherMap.containsKey(component)) {
                 int value = otherMap.get(component);
                 if (value > 0) {
-                    otherMap.put(component, value);
+                    otherMap.put(component, value - 1);
                     same++;
                 }
             }
@@ -63,6 +72,18 @@ public class EquationNode extends AbstractNode {
         if (otherSize == 0) {
             otherSize = 1;
         }
-        return 1.0 * same / thisSize * Math.min(thisSize, otherSize) / Math.max(thisSize, otherSize);
+        double rate = 1.0 * same / thisSize * Math.min(thisSize, otherSize) / Math.max(thisSize, otherSize);
+        if (this.getLine() > 0 && other.getLine() > 0) {
+            rate += (1.0 * Math.min(this.getLine(), other.getLine()) / Math.max(this.getLine(), other.getLine()) * 0.02);
+        }
+        return rate;
+    }
+
+    public String collectComponents() {
+        StringBuilder sb = new StringBuilder();
+        for (String component : components) {
+            sb.append(component);
+        }
+        return sb.toString();
     }
 }

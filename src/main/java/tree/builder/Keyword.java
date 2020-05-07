@@ -3,6 +3,7 @@ package tree.builder;
 import javafx.util.Pair;
 import tree.*;
 
+import java.security.Key;
 import java.util.*;
 
 public final class Keyword {
@@ -44,6 +45,7 @@ public final class Keyword {
 
     public static Keyword funKeyword = new Keyword("fun", true, (index, entries) -> {
         String name = entries.get(index + 1).getString();
+        EquationNode type = new EquationNode(Collections.emptyList(), Collections.emptyList());
 
         // Arguments
         List<ArgumentNode> arguments = new LinkedList<>();
@@ -56,18 +58,32 @@ public final class Keyword {
                 continue;
             }
             if (entries.getString(i + 1).equals(":")) {
-                arguments.add(new ArgumentNode(entries.getString(i), entries.getString(i + 2), isVararg));
+                arguments.add(new ArgumentNode(entries.getString(i),
+                        BuilderUtils.createEquationNode(i + 2, entries), isVararg));
                 arguments.get(arguments.size() - 1).setLine(entries.get(i).getLine());
-                i += 2;
+                i += 1 + arguments.get(arguments.size() - 1).getTypeName().getComponents().size();
             }
         }
 
-        if (entries.getFirst(bodyStart, "=") != -1 && entries.getFirst(bodyStart, "=") < entries.getFirst(bodyStart, "{")) {
+        // Type
+        i = bodyStart + 1;
+        if (entries.getString(i).equals(":")) {
+            int b1 = entries.getFirst(i, "{");
+            int b2 = entries.getFirst(i, "=");
+            b1 = b1 == -1 ? Integer.MAX_VALUE : b1;
+            b2 = b2 == -1 ? Integer.MAX_VALUE : b2;
+            b1 = b1 == b2 ? entries.size() : Math.min(b1, b2);
+            if (entries.getFirst(i, "{") == -1) {
+                type = BuilderUtils.createEquationNode(i + 1, b1, entries);
+            }
+            i += type.getComponents().size() + 1;
+        }
+        if (entries.getString(i).equals("=")) {
             List<Node> list = new ArrayList<>(1);
             list.add(BuilderUtils.createEquationNode(entries.getFirst(bodyStart, "=") + 1, entries));
             CallableNode node = new CallableNode(
                     name,
-                    "",
+                    type,
                     arguments,
                     new BodyNode(list)
             );
@@ -77,20 +93,25 @@ public final class Keyword {
                     node
             );
         }
-
-        // Type
-        String type = entries.getString(entries.getFirst(bodyStart, ":") + 1);
-        bodyStart = entries.getFirst(bodyStart, "{");
-
-        int closing = BuilderUtils.findClosingBracket(bodyStart, "{", "}", entries);
+        if (entries.getString(i).equals("{")) {
+            Pair<Integer, BodyNode> pair = BuilderUtils.createBodyNode(i, entries);
+            CallableNode node = new CallableNode(
+                    name,
+                    type,
+                    arguments,
+                    pair.getValue()
+            );
+            node.setLine(entries.get(index).getLine());
+            return new Pair<>(pair.getKey(), node);
+        }
         CallableNode node = new CallableNode(
                 name,
                 type,
                 arguments,
-                BuilderUtils.createBodyNode(entries.subList(bodyStart + 1, closing - 1))
+                new BodyNode(Collections.emptyList())
         );
         node.setLine(entries.get(index).getLine());
-        return new Pair<>(closing, node);
+        return new Pair<>(i - 1, node);
     });
 
     public static Keyword varKeyword = new Keyword("var", false, (index, entries) -> {
@@ -125,45 +146,14 @@ public final class Keyword {
             }
         }
         EquationNode statement = BuilderUtils.createEquationNode(opening, entries);
-        BodyNode trueBody;
-        if (!entries.getString(closing + 1).equals("{")) {
-            Keyword kw = map.get(entries.getString(closing + 1));
-            if (kw != null) {
-                Pair<Integer, Node> pair = kw.handle(closing + 1, entries);
-                opening = pair.getKey();
-                List<Node> list = new ArrayList<>(1);
-                list.add(pair.getValue());
-                trueBody = new BodyNode(list);
-            } else {
-                List<Node> list = new ArrayList<>(1);
-                list.add(BuilderUtils.createEquationNode(closing + 1, entries));
-                trueBody = new BodyNode(list);
-                opening = closing + ((EquationNode) list.get(0)).getComponents().size();
-            }
-        } else {
-            opening = BuilderUtils.findClosingBracket(closing + 1, "{", "}", entries);
-            trueBody = BuilderUtils.createBodyNode(entries.subList(closing + 1, opening));
-        }
+        Pair<Integer, BodyNode> pair = BuilderUtils.createBodyNode(closing + 1, entries);
+        BodyNode trueBody = pair.getValue();
+        opening = pair.getKey();
         BodyNode elseBody = null;
         if (entries.getString(opening + 1).equals("else")) {
-            if (!entries.getString(opening + 2).equals("{")) {
-                Keyword kw = map.get(entries.getString(opening + 2));
-                if (kw != null) {
-                    Pair<Integer, Node> pair = kw.handle(opening + 2, entries);
-                    closing = pair.getKey();
-                    List<Node> list = new ArrayList<>(1);
-                    list.add(pair.getValue());
-                    elseBody = new BodyNode(list);
-                } else {
-                    List<Node> list = new ArrayList<>(1);
-                    list.add(BuilderUtils.createEquationNode(opening + 2, entries));
-                    closing = opening + 1 + ((EquationNode) list.get(0)).getComponents().size();
-                    elseBody = new BodyNode(list);
-                }
-            } else {
-                closing = BuilderUtils.findClosingBracket(opening + 2, "{", "}", entries);
-                elseBody = BuilderUtils.createBodyNode(entries.subList(opening + 2, closing));
-            }
+            pair = BuilderUtils.createBodyNode(opening + 2, entries);
+            elseBody = pair.getValue();
+            closing = pair.getKey();
         }
         if (elseBody == null) {
             elseBody = BuilderUtils.createBodyNode(entries.subList(opening + 1, opening - 1));
@@ -176,38 +166,121 @@ public final class Keyword {
         return new Pair<>(closing, it);
     });
 
-    public static Keyword returnKeyword = new Keyword("return", false, (index, entries) -> {
-        EquationNode eq = BuilderUtils.createEquationNode(index + 1, entries);
-        List<Node> list = new ArrayList<>(1);
-        list.add(BuilderUtils.createEquationNode(index + 1, entries));
-        SimpleNode node = new SimpleNode("return", list);
-        node.setLine(entries.get(index).getLine());
-        return new Pair<>(eq.getComponents().size() + index, node);
-    });
+    public static Keyword importKeyword = new Keyword("import", false, (index, entries) ->
+            BuilderUtils.createSimpleNodeOneComponent(index, "import", entries));
+
+    public static Keyword packageKeyword = new Keyword("package", false, (index, entries) ->
+            BuilderUtils.createSimpleNodeOneComponent(index, "package", entries));
+
+
+    public static Keyword returnKeyword = new Keyword("return", false, (index, entries) ->
+            BuilderUtils.createSimpleNodeOneComponent(index, "return", entries));
+
 
     public static Keyword forKeyword = new Keyword("for", true, (index, entries) -> {
         int opening = index + 1;
         int closing = BuilderUtils.findClosingBracket(opening, "(", ")", entries);
         EquationNode equation = BuilderUtils.createEquationNode(opening + 1, entries);
         opening = closing + 1;
-        closing = BuilderUtils.findClosingBracket(opening, "{", "}", entries);
-        BodyNode body = BuilderUtils.createBodyNode(entries.subList(opening, closing));
-        BrunchNode node = new BrunchNode(equation, body, null);
+        Pair<Integer, BodyNode> pair = BuilderUtils.createBodyNode(opening, entries);
+        BodyNode body = pair.getValue();
+        closing = pair.getKey();
+        BrunchNode node = new BrunchNode(equation, body, new BodyNode(Collections.emptyList()));
         node.setLine(entries.get(index).getLine());
         return new Pair<>(closing, node);
     });
     public static Keyword whileKeyword = new Keyword("while", true, forKeyword.executor);
 
-
+    public static Keyword classKeyword = new Keyword("class", true, (index, entries) -> {
+        String name = entries.getString(index + 1);
+        List<Node> supertypes = new ArrayList<>(0);
+        List<Node> typeBounds = new ArrayList<>(0);
+        BodyNode body = new BodyNode(new ArrayList<>());
+        CallableNode call = null;
+        int indx = index + 2;
+        if (index + 2 >= entries.size()) {
+            ClassNode node = new ClassNode(name, Collections.emptyList(), Collections.emptyList(),
+                    new BodyNode(Collections.emptyList()));
+            node.setLine(entries.get(index).getLine());
+            return new Pair<>(index + 1, node);
+        }
+        if (entries.getString(index + 2).equals("<")) {
+            int closing = BuilderUtils.findClosingBracket(index + 2, "<", ">", entries);
+            for (int i = index + 3; i < closing; i++) {
+                typeBounds.add(BuilderUtils.createEquationNode(i, closing - 1, entries));
+                i += ((EquationNode) typeBounds.get(typeBounds.size() - 1)).getComponents().size();
+            }
+            indx = closing + 1;
+        }
+        if (entries.getString(indx).equals("constructor")) {
+            indx += 1;
+        }
+        if (!entries.getString(indx).equals("fun") && entries.getString(indx + 1).equals("constructor")) {
+            indx += 2;
+        }
+        if (indx < entries.size() && entries.getString(indx).equals("(")) {
+            int closing = BuilderUtils.findClosingBracket(indx, "(", ")", entries);
+            indx++;
+            List<ArgumentNode> arguments = new ArrayList<>();
+            boolean isVararg = false;
+            for (; indx < closing; indx++) {
+                if (entries.get(indx).getString().equals("vararg")) {
+                    isVararg = true;
+                    continue;
+                }
+                if (entries.getString(indx + 1).equals(":")) {
+                    arguments.add(new ArgumentNode(entries.getString(indx),
+                            BuilderUtils.createEquationNode(indx + 2, entries), isVararg));
+                    arguments.get(arguments.size() - 1).setLine(entries.get(indx).getLine());
+                    indx += 1 + arguments.get(arguments.size() - 1).getTypeName().getComponents().size();
+                }
+            }
+            List<String> comps = new ArrayList<>(1);
+            comps.add(name);
+            call = new CallableNode(name, new EquationNode(comps, Collections.emptyList()), arguments,
+                    new BodyNode(Collections.emptyList()));
+            indx = closing + 1;
+        }
+        if (indx < entries.size() && entries.getString(indx).equals(":")) {
+            for (int i = indx + 1; i < entries.size(); i++) {
+                if (entries.getFirst(i, "{") != -1) {
+                    supertypes.add(BuilderUtils.createEquationNode(i, entries.getFirst(i, "{") - 1, entries));
+                } else {
+                    supertypes.add(BuilderUtils.createEquationNode(i, entries));
+                }
+                i += ((EquationNode) supertypes.get(supertypes.size() - 1)).getComponents().size();
+                if (!entries.getString(i).equals(",")) {
+                    indx = i;
+                    break;
+                }
+            }
+        }
+        if (indx < entries.size() && entries.getString(indx).equals("{")) {
+            Pair<Integer, BodyNode> pair = BuilderUtils.createBodyNode(indx, entries);
+            body = pair.getValue();
+            indx = pair.getKey() + 1;
+        }
+        if (call != null) {
+            body.getNodes().add(call);
+        }
+        ClassNode node = new ClassNode(name, typeBounds, supertypes, body);
+        node.setLine(entries.get(index).getLine());
+        return new Pair<>(indx - 1, node);
+    });
+    public static Keyword interfaceKeyword = new Keyword("interface", true, classKeyword.executor);
 
     static {
         map.put(funKeyword.toString(), funKeyword);
         map.put(varKeyword.toString(), varKeyword);
         map.put(valKeyword.toString(), valKeyword);
         map.put(ifKeyword.toString(), ifKeyword);
+        map.put(importKeyword.toString(), importKeyword);
+        map.put(packageKeyword.toString(), packageKeyword);
         map.put(returnKeyword.toString(), returnKeyword);
         map.put(forKeyword.toString(), forKeyword);
         map.put(whileKeyword.toString(), whileKeyword);
+        map.put(classKeyword.toString(), classKeyword);
+        map.put(interfaceKeyword.toString(), interfaceKeyword);
     }
 
     private interface Executor {

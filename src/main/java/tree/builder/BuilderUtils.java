@@ -48,10 +48,47 @@ public class BuilderUtils {
         return new BodyNode(nodes);
     }
 
-    public static EquationNode createEquationNode(int index, EntryList entries) throws Exception {
+    public static Pair<Integer, Node> createSimpleNodeOneComponent(int index, String name, EntryList entries) throws Exception {
+        List<Node> list = new ArrayList<>(1);
+        int size = 0;
+        if (index + 1 < entries.size()) {
+            EquationNode eq = BuilderUtils.createEquationNode(index + 1, entries);
+            list.add(BuilderUtils.createEquationNode(index + 1, entries));
+            size = eq.getComponents().size();
+        }
+        SimpleNode node = new SimpleNode(name, list);
+        node.setLine(entries.get(index).getLine());
+        return new Pair<>(size + index, node);
+    }
+
+    public static Pair<Integer, BodyNode> createBodyNode(int index, EntryList entries) throws Exception {
+        int end;
+        BodyNode body;
+        if (!entries.getString(index).equals("{")) {
+            Keyword kw = Keyword.get(entries.getString(index));
+            if (kw != null) {
+                Pair<Integer, Node> pair = kw.handle(index, entries);
+                end = pair.getKey();
+                List<Node> list = new ArrayList<>(1);
+                list.add(pair.getValue());
+                body = new BodyNode(list);
+            } else {
+                List<Node> list = new ArrayList<>(1);
+                list.add(BuilderUtils.createEquationNode(index, entries));
+                body = new BodyNode(list);
+                end = index + ((EquationNode) list.get(0)).getComponents().size() - 1;
+            }
+        } else {
+            end = BuilderUtils.findClosingBracket(index, "{", "}", entries);
+            body = BuilderUtils.createBodyNode(entries.subList(index + 1, end - 1));
+        }
+        return new Pair<>(end, body);
+    }
+
+    public static EquationNode createEquationNode(int index, int endIndex, EntryList entries) throws Exception {
         boolean wasOperator = true;
         List<Node> nodes = new ArrayList<>();
-        for (int i = index; i < entries.size(); i++) {
+        for (int i = index; i <= endIndex; i++) {
             if (entries.getString(i).equals("(")) {
                 int iold = i + 1;
                 int line = entries.get(i).getLine();
@@ -75,6 +112,13 @@ public class BuilderUtils {
                 wasOperator = false;
                 continue;
             }
+            if (entries.getString(i).equals("[")) {
+                nodes.add(createEquationNode(i + 1, entries));
+                nodes.get(nodes.size() - 1).setLine(entries.get(i + 1).getLine());
+                i = findClosingBracket(i, "[", "]", entries);
+                wasOperator = false;
+                continue;
+            }
             if (operators.contains(entries.getString(i))) {
                 wasOperator = true;
                 continue;
@@ -86,9 +130,13 @@ public class BuilderUtils {
             }
             wasOperator = false;
         }
-        EquationNode eq = new EquationNode(entries.stringList().subList(index, entries.size()), nodes);
+        EquationNode eq = new EquationNode(entries.stringList().subList(index, endIndex + 1), nodes);
         eq.setLine(entries.get(index).getLine());
         return eq;
+    }
+
+    public static EquationNode createEquationNode(int index, EntryList entries) throws Exception {
+        return createEquationNode(index, entries.size() - 1, entries);
     }
 
     private static List<String> operators = new ArrayList<>();
@@ -113,8 +161,7 @@ public class BuilderUtils {
         operators.add("<=");
         operators.add(".");
         operators.add("to");
-        operators.add("[");
-        operators.add("]");
+        operators.add("");
         operators.add("=");
     }
 }

@@ -9,7 +9,7 @@ import java.util.List;
 public class CheckerUtils {
     public static Node getClosestNode(Tree tree, int line) {
         for (int i = line; i >= 0; i--) {
-            Node node = getNodeByLine(tree, line);
+            Node node = getNodeByLine(tree, i);
             if (node != null) {
                 return node;
             }
@@ -34,15 +34,24 @@ public class CheckerUtils {
     }
 
     public static Node getNodeByLine(List<Node> nodes, int line) {
+        Node candidate = null;
         for (Node n : nodes) {
             if (n == null) {
                 continue;
             }
             if (n.getLine() == line) {
-                return n;
+                if (n.getType() == Node.Type.EQUATION) {
+                    if (((EquationNode) n).getNodes().size() > 0) {
+                        return n;
+                    } else {
+                        candidate = n;
+                    }
+                } else {
+                    return n;
+                }
             }
         }
-        return null;
+        return candidate;
     }
 
     public static List<Node> getAllNodes(Tree tree) {
