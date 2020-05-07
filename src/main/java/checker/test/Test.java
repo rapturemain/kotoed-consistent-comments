@@ -2,6 +2,8 @@ package checker.test;
 
 import checker.Checker;
 import javafx.util.Pair;
+import tree.Tree;
+import tree.builder.Builder;
 
 import java.io.File;
 import java.io.FileReader;
@@ -13,6 +15,17 @@ public class Test {
         test("test2old.txt", "test2new.txt", 5, 4, "Test test2");
         test("test3old.txt", "test3new.txt", 10, 10, "Test test3");
         test("test4old.txt", "test4new.txt", 7, 11, "Test test4");
+
+        test("test5old.txt", "test5new.txt", 31, 34, "Test test5 31");
+        test("test5old.txt", "test5new.txt", 39, 25, "Test test5 29");
+        test("test5old.txt", "test5new.txt", 52, 57, "Test test5 52");
+        test("test5old.txt", "test5new.txt", 60, 65, "Test test5 60");
+
+        test("test6old.txt", "test6new.txt", 3, 3, "Test test6 3");
+        test("test6old.txt", "test6new.txt", 4, 4, "Test test6 4");
+        test("test6old.txt", "test6new.txt", 8, 7, "Test test6 8");
+        test("test6old.txt", "test6new.txt", 13, 16, "Test test6 16");
+
         testUnchanged("funBuildTest1.txt", "Test funBuildTest1");
         testUnchanged("funBuildTest2.txt", "Test funBuildTest2");
         testUnchanged("test2new.txt", "Test test2new");
@@ -52,8 +65,10 @@ public class Test {
                 countLines++;
             }
         }
+        Tree tree1 = Builder.build(file1);
+        Tree tree2 = Builder.build(file1);
         for (int i = 1; i <= countLines; i++) {
-            Pair<Integer, String> result = Checker.check(file1, file1, i);
+            Pair<Integer, String> result = Checker.check(tree1, tree2, i);
             if (result.getKey() != i) {
                 if (result.getKey() != -2) {
                     System.out.println(result.getValue());

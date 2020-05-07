@@ -14,11 +14,6 @@ public final class Keyword {
         this.executor = executor;
     }
 
-    private Keyword(String keyword) {
-        this.keyword = keyword;
-        this.withBody = false;
-    }
-
     private boolean withBody;
     private String keyword;
     private Executor executor;
@@ -59,7 +54,7 @@ public final class Keyword {
             }
             if (entries.getString(i + 1).equals(":")) {
                 arguments.add(new ArgumentNode(entries.getString(i),
-                        BuilderUtils.createEquationNode(i + 2, entries), isVararg));
+                        BuilderUtils.createEquationNode(i + 2, bodyStart, entries), isVararg));
                 arguments.get(arguments.size() - 1).setLine(entries.get(i).getLine());
                 i += 1 + arguments.get(arguments.size() - 1).getTypeName().getComponents().size();
             }
@@ -277,8 +272,8 @@ public final class Keyword {
         map.put(importKeyword.toString(), importKeyword);
         map.put(packageKeyword.toString(), packageKeyword);
         map.put(returnKeyword.toString(), returnKeyword);
-        map.put(forKeyword.toString(), forKeyword);
-        map.put(whileKeyword.toString(), whileKeyword);
+//        map.put(forKeyword.toString(), forKeyword);
+//        map.put(whileKeyword.toString(), whileKeyword);
         map.put(classKeyword.toString(), classKeyword);
         map.put(interfaceKeyword.toString(), interfaceKeyword);
     }

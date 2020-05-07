@@ -11,6 +11,10 @@ public class Checker {
     public static Pair<Integer, String> check(String file1, String file2, int line) throws Exception {
         Tree tree1 = Builder.build(file1);
         Tree tree2 = Builder.build(file2);
+        return check(tree1, tree2, line);
+    }
+
+    public static Pair<Integer, String> check(Tree tree1, Tree tree2, int line) {
         Node oldNode = CheckerUtils.getNodeByLine(tree1, line);
         if (oldNode == null) {
             return new Pair<>(-2, "Cannot find node on the line: " + line);

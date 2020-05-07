@@ -54,15 +54,19 @@ public class EquationNode extends AbstractNode {
             componentsO = Arrays.asList(componentsO.get(0).split(" "));
         }
         for (String component : componentsO) {
-            otherMap.merge(component, 1, Integer::sum);
+            for (String c : component.split(" ")) {
+                otherMap.merge(c, 1, Integer::sum);
+            }
         }
         int same = 0;
         for (String component : components) {
-            if (otherMap.containsKey(component)) {
-                int value = otherMap.get(component);
-                if (value > 0) {
-                    otherMap.put(component, value - 1);
-                    same++;
+            for (String c : component.split(" ")) {
+                if (otherMap.containsKey(c)) {
+                    int value = otherMap.get(c);
+                    if (value > 0) {
+                        otherMap.put(c, value - 1);
+                        same++;
+                    }
                 }
             }
         }
@@ -75,6 +79,19 @@ public class EquationNode extends AbstractNode {
         double rate = 1.0 * same / thisSize * Math.min(thisSize, otherSize) / Math.max(thisSize, otherSize);
         if (this.getLine() > 0 && other.getLine() > 0) {
             rate += (1.0 * Math.min(this.getLine(), other.getLine()) / Math.max(this.getLine(), other.getLine()) * 0.02);
+        }
+
+        thisSize = this.nodes.size();
+        otherSize = other.nodes.size();
+        double buffer = 0;
+        for (Node n : this.nodes) {
+            for (Node nO : other.nodes) {
+                buffer += n.equalityRate(nO);
+            }
+        }
+        if (thisSize > 0 && otherSize > 0) {
+            rate += buffer / thisSize * Math.min(thisSize, otherSize) / Math.max(thisSize, otherSize);
+            rate /= 2;
         }
         return rate;
     }

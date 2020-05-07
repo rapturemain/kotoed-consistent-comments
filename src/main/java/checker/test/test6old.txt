@@ -1,0 +1,16 @@
+fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
+    val map = mutableMapOf<String, Double>()
+    val buffer = mutableMapOf<String, Pair<Double, Int>>()
+    stockPrices.forEach {
+        (key, value) ->
+        if (buffer.containsKey(key)) {
+            val (first, second) = buffer.getValue(key)
+            buffer.replace(key, (first to second), (first + value to second + 1))
+        } else buffer[key] = value to 1
+    }
+    buffer.forEach {
+        key, value ->
+        map[key] = value.first / value.second
+    }
+    return map
+}
