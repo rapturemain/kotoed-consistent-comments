@@ -10,6 +10,7 @@ import java.util.*;
 public class Builder {
     public static Tree build(String text) throws Exception {
         EntryList entries = split(text);
+        findRawStrings(entries);
         List<Node> list = new ArrayList<>();
         Pair<Integer, Node> pair = null;
         for (int i = 0; i < entries.size(); i++) {
@@ -70,7 +71,7 @@ public class Builder {
         int commentBrackets = 0;
         for (int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);
-            if (c == '\n' && !isChar && !isString) {
+            if (c == '\n') {
                 line++;
                 singleLineComment = false;
             }
@@ -139,6 +140,27 @@ public class Builder {
         }
         addToList(sb, str.length(), line, list);
         return list;
+    }
+
+    private static EntryList findRawStrings(EntryList entries) {
+        List<Integer> indicesToRemove = new ArrayList<>();
+        for (int i = 0; i < entries.size() - 2; i++) {
+            if (entries.getString(i).equals("\"\"") && entries.getString(i + 2).equals("\"\"") &&
+                    entries.getString(i + 1).length() > 1 && entries.getString(i + 1).charAt(0) == '\"' &&
+                    entries.getString(i + 1).charAt(entries.getString(i + 1).length() - 1) == '\"') {
+                indicesToRemove.add(i);
+            }
+        }
+        for (int i = 0; i < indicesToRemove.size(); i++) {
+            int index = indicesToRemove.get(i) - i * 2;
+            Entry entry = new Entry(entries.getIndex(index), entries.getString(index) + entries.getString(index + 1) +
+                    entries.getString(index + 2));
+            entries.remove(index);
+            entries.remove(index);
+            entries.remove(index);
+            entries.add(index, entry);
+        }
+        return entries;
     }
 
     private static void addToList(StringBuilder sb, int index, int line, EntryList list) {

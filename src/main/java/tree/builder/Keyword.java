@@ -39,7 +39,10 @@ public final class Keyword {
     }
 
     public static Keyword funKeyword = new Keyword("fun", true, (index, entries) -> {
-        String name = entries.get(index + 1).getString();
+        StringBuilder name = new StringBuilder();
+        for (int i = entries.getFirst(index, "(") - 1; i > index;i--) {
+            name.insert(0, entries.getString(i));
+        }
         EquationNode type = new EquationNode(Collections.emptyList(), Collections.emptyList());
 
         // Arguments
@@ -67,17 +70,15 @@ public final class Keyword {
             int b2 = entries.getFirst(i, "=");
             b1 = b1 == -1 ? Integer.MAX_VALUE : b1;
             b2 = b2 == -1 ? Integer.MAX_VALUE : b2;
-            b1 = b1 == b2 ? entries.size() : Math.min(b1, b2);
-            if (entries.getFirst(i, "{") == -1) {
-                type = BuilderUtils.createEquationNode(i + 1, b1, entries);
-            }
+            b1 = Math.min(b1, b2);
+            type = BuilderUtils.createEquationNode(i + 1, b1 - 1, entries);
             i += type.getComponents().size() + 1;
         }
         if (entries.getString(i).equals("=")) {
             List<Node> list = new ArrayList<>(1);
             list.add(BuilderUtils.createEquationNode(entries.getFirst(bodyStart, "=") + 1, entries));
             CallableNode node = new CallableNode(
-                    name,
+                    name.toString(),
                     type,
                     arguments,
                     new BodyNode(list)
@@ -91,7 +92,7 @@ public final class Keyword {
         if (entries.getString(i).equals("{")) {
             Pair<Integer, BodyNode> pair = BuilderUtils.createBodyNode(i, entries);
             CallableNode node = new CallableNode(
-                    name,
+                    name.toString(),
                     type,
                     arguments,
                     pair.getValue()
@@ -100,7 +101,7 @@ public final class Keyword {
             return new Pair<>(pair.getKey(), node);
         }
         CallableNode node = new CallableNode(
-                name,
+                name.toString(),
                 type,
                 arguments,
                 new BodyNode(Collections.emptyList())

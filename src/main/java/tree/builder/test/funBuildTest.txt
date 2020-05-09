@@ -12,7 +12,14 @@ fun foo2(arr: Array<Int>, my: My, your: Your): Any {
     var v3 = v2.let {
         doSomething()
     }
-}
+    var v4 = """
+        SUPER
+        RAW
+        STRING
+        """
+    }
+
+    infix fun Int.superFun() = 0
 
 fun foo3() = "sometext".someMethod().let {
     hardfoo()

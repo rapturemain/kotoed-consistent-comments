@@ -10,6 +10,11 @@ public class Entry {
     private String string;
     private int line = 0;
 
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
     public int getIndex() {
         return index;
     }

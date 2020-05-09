@@ -7,7 +7,7 @@ import java.io.*;
 
 public class Test {
     public static void main(String[] args) throws Exception {
-        Tree list = Builder.build(fileToString("src\\main\\java\\tree\\builder\\test\\testBug.txt"));
+        Tree list = Builder.build(fileToString("src\\main\\java\\tree\\builder\\test\\funBuildTest.txt"));
         System.out.println(list.getNodes().size());
     }
 
